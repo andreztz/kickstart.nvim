@@ -128,6 +128,11 @@ require('telescope').setup {
 -- Enable telescope fzf native
 require('telescope').load_extension 'fzf'
 
+vim.keymap.set("", "<;>", "<Nop>", { noremap = true, silent = true })
+vim.g.mapleader = ";"
+vim.g.maplocalleader = ";"
+
+
 --Add leader shortcuts
 vim.keymap.set('n', '<leader><space>', require('telescope.builtin').buffers)
 vim.keymap.set('n', '<leader>sf', function()
@@ -221,8 +226,9 @@ local on_attach = function(_, bufnr)
   vim.keymap.set('n', 'gr', vim.lsp.buf.references, opts)
   vim.keymap.set('n', '<leader>ca', vim.lsp.buf.code_action, opts)
   vim.keymap.set('n', '<leader>so', require('telescope.builtin').lsp_document_symbols, opts)
-  vim.api.nvim_create_user_command("Format", vim.lsp.buf.formatting, {})
+  vim.api.nvim_create_user_command("Format", vim.lsp.buf.format, {})
 end
+
 
 -- nvim-cmp supports additional completion capabilities
 local capabilities = vim.lsp.protocol.make_client_capabilities()
@@ -236,6 +242,7 @@ for _, lsp in ipairs(servers) do
     capabilities = capabilities,
   }
 end
+
 
 -- Example custom server
 -- Make runtime files discoverable to the server
@@ -313,4 +320,11 @@ cmp.setup {
     { name = 'luasnip' },
   },
 }
+
+-- Restore cursor position
+vim.cmd [[ 
+    autocmd BufRead * autocmd FileType <buffer> ++once
+      \ if &ft !~# 'commit\|rebase' && line("'\"") > 1 && line("'\"") <= line("$") | exe 'normal! g`"' | endif
+]]
+
 -- vim: ts=2 sts=2 sw=2 et
